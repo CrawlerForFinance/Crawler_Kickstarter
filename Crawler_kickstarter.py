@@ -11,10 +11,6 @@ import socket
 from tools_kickstarter import *
 import logging
 
-from analyze_data import analyzeData
-from analyze_newlyend_data import analyzeNewlyEndData
-from analyze_newlyend_user_data import analyzeNewlyEndUsersData
-
 #global constant
 DEBUG = False
 SORT_TYPE = 'end_date'
@@ -109,9 +105,9 @@ class getUrlQueueThread(threading.Thread):
             #pageUrl = urlCategory+'page='+str(pageCount)+'&category_id='+str(self.categoryId)+'&woe_id=0&sort='+SORT_TYPE
             #pageUrl = urlCategory+'page='+str(pageCount)+ '&sort='+SORT_TYPE
             if "&" in categoryName:
-            	pageUrl = urlStartPage + "film%20&%20video" + "?page=" + str(pageCount) + "&sort=" + SORT_TYPE
+                pageUrl = urlStartPage + "film%20&%20video" + "?page=" + str(pageCount) + "&sort=" + SORT_TYPE
             else:
-            	pageUrl = urlStartPage+categoryName + '?page='+str(pageCount)+ '&sort='+SORT_TYPE
+                pageUrl = urlStartPage+categoryName + '?page='+str(pageCount)+ '&sort='+SORT_TYPE
             # print 'pageUrl:', pageUrl
             print pageUrl
             pageLock.release()
@@ -272,10 +268,44 @@ def getAllCategory(filedirectory):
 #end def getData()
 #---------------------------
 def getInput():
-    global categoryNo, startPage, endPage, getUsers
+    global categoryNo, startPage, endPage, getUsers, getAllData, monthNo, categoryStart, categoryEnd
     getUsers = False
+    getAllData = False
     length = len(categoryIdList)
     while True:
+# getAllData
+        try:
+            raw_getAllData = raw_input(u'Get All Data(y) or set a certain category and a certain month(n)?:\n')
+            if (raw_getAllData == 'y' or raw_getAllData == 'Y'):
+                getAllData = True
+            elif (raw_getAllData == 'n' or raw_getAllData == 'N'):
+                getAllData = False
+            else:
+                print('Please input y or n!')
+                continue
+            break
+        except:
+            if(raw_categoryNo == ''):
+                categoryNo = 1
+                break
+            print('Not a number. Please input again!')
+            continue
+    while getAllData:
+        try:
+            raw_categoryNo = raw_input(u'Input category section as ("1,4" means from the 1st to 4th):\n')
+            categoryNoSectionStr = raw_categoryNo.split(",")
+            categoryStart = int(categoryNoSectionStr[0])
+            categoryEnd = int(categoryNoSectionStr[1])
+            if (categoryStart > categoryEnd):
+                print('first number should be smaller then the last number!')
+                continue
+            break
+        except:
+            if(raw_categoryNo == ''):
+                break
+            print('Not a number. Please input again!')
+            continue
+    while not getAllData:
         try:
             raw_categoryNo = raw_input(u'Input category number(1-'+str(length)+', default=1):\n')
             categoryNo = int(raw_categoryNo)
@@ -289,17 +319,18 @@ def getInput():
                 break
             print('Not a number. Please input again!')
             continue
-    while True:
+    while not getAllData:
         try:
-            raw_categoryGetUsers = raw_input('Get users from all new ended projects?(1 for yes/ 0 for no):\n')
-            if (int(raw_categoryGetUsers) == 1):
-                getUsers = True
+            raw_categoryGetUsers = raw_input('Input nth Month(6,7,8,9,10,11,12,1):\n')
+            if ((int(raw_categoryGetUsers) == 1) or (int(raw_categoryGetUsers) >= 6 and int(raw_categoryGetUsers) <= 12)):
+                monthNo = int(raw_categoryGetUsers)
             else:
-                getUsers = False
+                print('Please input right month')
+                continue
             break
         except:
             if(raw_categoryGetUsers == ''):
-                getUsers = False
+                # getUsers = False
                 break
             print('1Command input illegal! Please type with 1 or 0!')
             continue
@@ -392,7 +423,6 @@ exitFlag = 0
 pageCount = 0 #翻页计数器
 threadCount = 8 #并发线程数
 urlNum = 0
-getUsers = False
 #----------------------------
 #main
 if __name__=='__main__':
@@ -416,7 +446,7 @@ if __name__=='__main__':
     filedirectory = getConfig()
     print 'get active num'
     
-    getActiveNum()
+    # getActiveNum()
     
     if login():
         print '------------INPUT INFORMATION---------------------'
@@ -426,38 +456,44 @@ if __name__=='__main__':
         print '- ThreadCount='+str(threadCount)
         print '------------INPUT INFORMATION---------------------'
         
-        queueLock = threading.Lock()
-        pageLock = threading.Lock()
-        pageCount = 0
-        getUrlQueue(categoryNo)
+        # queueLock = threading.Lock()
+        # pageLock = threading.Lock()
+        # pageCount = 0
+        # getUrlQueue(categoryNo)
         
-        categoryId = categoryIdList[categoryNo-1]
-        categoryName = categoryNameList[categoryNo-1]
-        subFolder = filedirectory+categoryName+'/'
-        createFolder(subFolder)
-        writers = createWriters(subFolder, categoryName)
+        if getAllData:
+            for index in range(categoryStart, categoryEnd + 1):
+                categoryName = categoryNameList[index-1]
+                subFolder = filedirectory+categoryName+'/'
+                createFolder(subFolder)
+        else:
+            categoryId = categoryIdList[categoryNo-1]
+            categoryName = categoryNameList[categoryNo-1]
+            subFolder = filedirectory+categoryName+'/'
+            createFolder(subFolder)
+        # writers = createWriters(subFolder, categoryName)
 
-        startTime = time.clock()
-        threads = []
+        # startTime = time.clock()
+        # threads = []
 
         
-        for i in xrange(threadCount):
-            thread = getDataThread(i+1, urlQueue)
-            threads.append(thread)
+        # for i in xrange(threadCount):
+        #     thread = getDataThread(i+1, urlQueue)
+        #     threads.append(thread)
             
-        for t in threads:
-            t.start()
+        # for t in threads:
+        #     t.start()
         
-        while not urlQueue.empty():
-            pass
+        # while not urlQueue.empty():
+        #     pass
         
-        exitFlag = 1
+        # exitFlag = 1
         
-        for t in threads:
-            t.join()
-        print("Exiting Main Thread")
-        endTime = time.clock()
-        print(u'[Total execute time]:'+str(endTime-startTime)+'s')
+        # for t in threads:
+        #     t.join()
+        # print("Exiting Main Thread")
+        # endTime = time.clock()
+        # print(u'[Total execute time]:'+str(endTime-startTime)+'s')
         #10 thread: 637s: 400 projects
         
 
@@ -498,14 +534,33 @@ if __name__=='__main__':
 
         
         import datetime
-        categoryName = categoryNameList[categoryNo-1]
-        #for cat in categoryNameList:
-        if datetime.date.today().day == 1:
+        if not getAllData:
+            categoryName = categoryNameList[categoryNo-1]
+            #for cat in categoryNameList:
+            # if datetime.date.today().day == 1:
             newly_end_writer = CreateNewlyEndWriter(categoryName)
             yesterday = datetime.date.today()-datetime.timedelta(days=1)
             lastMonth = yesterday.strftime("%Y%m")
             #name_sheet = filedirectory+"NewlyEnd_"+categoryName+"_"+lastMonth+".txt"
-            name_sheet = filedirectory+"/NewlyEnd_"+categoryName+"_"+lastMonth + ".txt"
+            monthNoStr = ""
+            if (monthNo == 1):
+                monthNoStr = "201601"
+            elif (monthNo == 6):
+                monthNoStr = "201506"
+            elif (monthNo == 7):
+                monthNoStr = "201507"
+            elif (monthNo == 8):
+                monthNoStr = "201508"
+            elif (monthNo == 9):
+                monthNoStr = "201509"
+            elif (monthNo == 10):
+                monthNoStr = "201510"
+            elif (monthNo == 11):
+                monthNoStr = "201511"
+            elif (monthNo == 12):
+                monthNoStr = "201512"
+            name_sheet = filedirectory+"/NewlyEnd_" + categoryName+"_"+ monthNoStr + ".txt"
+            # name_sheet = "/Users/shawn/Documents/project/kick/newversion/data/NewlyEnd_Dance_201506.txt"
             try:
                 urlFile = open(name_sheet)
                 if urlFile:
@@ -520,4 +575,37 @@ if __name__=='__main__':
             except Exception, e:
                 print e
                 raise e
+        else:
+            for index in range(categoryStart, categoryEnd + 1):
+                categoryName = categoryNameList[index-1]
+                #for cat in categoryNameList:
+                # if datetime.date.today().day == 1:
+                newly_end_writer = CreateNewlyEndWriter(categoryName)
+                yesterday = datetime.date.today()-datetime.timedelta(days=1)
+                lastMonth = yesterday.strftime("%Y%m")
+                #name_sheet = filedirectory+"NewlyEnd_"+categoryName+"_"+lastMonth+".txt"
+                monthNoStr = ""
+                for monthIndex in range(0, 8):
+                    if monthIndex % 8 == 7:
+                        monthNoStr = "201601"
+                    elif monthIndex % 8 <= 3:
+                        monthNoStr = "20150" + str(monthIndex % 8 + 6)
+                    else:
+                        monthNoStr = "2015" + str(monthIndex % 8 + 6)
+                    name_sheet = filedirectory+"/NewlyEnd_" + categoryName+"_"+ monthNoStr + ".txt"
+                    # name_sheet = "/Users/shawn/Documents/project/kick/newversion/data/NewlyEnd_Dance_201506.txt"
+                    try:
+                        urlFile = open(name_sheet)
+                        if urlFile:
+                            print 'getFile'
+                            urllist = urlFile.readlines()
+                            print len(urllist)
+                            unniurllist = list(set(urllist))
+                            print len(unniurllist)
+                            for url in urllist:
+                                analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
+                                print 'heiheihei'
+                    except Exception, e:
+                        print e
+                        raise e
         
