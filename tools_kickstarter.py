@@ -15,7 +15,6 @@ from dateutil.parser import parse
 import pytz
 import traceback
 import re
-from ghost import Ghost
 
 configfileName = 'config'
 # filedirectory = u'D:\\datas\\pythondatas\\kickstarter\\'
