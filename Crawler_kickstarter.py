@@ -268,32 +268,32 @@ def getAllCategory(filedirectory):
 #end def getData()
 #---------------------------
 def getInput():
-    global categoryNo, startPage, endPage, getUsers, getAllData, monthNo, categoryStart, categoryEnd
+    global categoryNo, startPage, endPage, getUsers, getAllData, monthNo, categoryStart, categoryEnd, monthStart, monthEnd
     getUsers = False
     getAllData = False
     length = len(categoryIdList)
+#     while True:
+# # getAllData
+#         try:
+#             raw_getAllData = raw_input(u'Get All Data (y) or set a certain category and a certain month (n)?:\n')
+#             if (raw_getAllData == 'y' or raw_getAllData == 'Y'):
+#                 getAllData = True
+#             elif (raw_getAllData == 'n' or raw_getAllData == 'N'):
+#                 getAllData = False
+#             else:
+#                 print('Please input y or n!')
+#                 continue
+#             break
+#         except:
+#             if(raw_categoryNo == ''):
+#                 categoryNo = 1
+#                 break
+#             print('Not a number. Please input again!')
+#             continue
     while True:
-# getAllData
         try:
-            raw_getAllData = raw_input(u'Get All Data(y) or set a certain category and a certain month(n)?:\n')
-            if (raw_getAllData == 'y' or raw_getAllData == 'Y'):
-                getAllData = True
-            elif (raw_getAllData == 'n' or raw_getAllData == 'N'):
-                getAllData = False
-            else:
-                print('Please input y or n!')
-                continue
-            break
-        except:
-            if(raw_categoryNo == ''):
-                categoryNo = 1
-                break
-            print('Not a number. Please input again!')
-            continue
-    while getAllData:
-        try:
-            raw_categoryNo = raw_input(u'Input category section as ("1,4" means from the 1st to 4th):\n')
-            categoryNoSectionStr = raw_categoryNo.split(",")
+            raw_categoryNoSection = raw_input(u'Input category section, ("1,5" means "[1, 5)"):\n')
+            categoryNoSectionStr = raw_categoryNoSection.split(",")
             categoryStart = int(categoryNoSectionStr[0])
             categoryEnd = int(categoryNoSectionStr[1])
             if (categoryStart > categoryEnd):
@@ -301,39 +301,51 @@ def getInput():
                 continue
             break
         except:
-            if(raw_categoryNo == ''):
+            if(raw_categoryNoSection == '' or raw_categoryNoSection.find(',') == -1):
                 break
-            print('Not a number. Please input again!')
+            print('Not a section. Please input again!')
             continue
-    while not getAllData:
+    while True:
         try:
-            raw_categoryNo = raw_input(u'Input category number(1-'+str(length)+', default=1):\n')
-            categoryNo = int(raw_categoryNo)
-            if categoryNo < 1 or categoryNo > length:
-                print('Category number illegal! Please input again!')
-                continue
+            raw_monthSection = raw_input('Input month section, ("10,2" means "[10,2)")\n')
+            monthSectionStr = raw_monthSection.split(",")
+            monthStart = int(monthSectionStr[0])
+            monthEnd = int(monthSectionStr[1])
             break
         except:
-            if(raw_categoryNo == ''):
-                categoryNo = 1
+            if(raw_monthSection == '' or raw_monthSection.find(',') == -1):
                 break
-            print('Not a number. Please input again!')
+            print('Not a section. Please input again!')
             continue
-    while not getAllData:
-        try:
-            raw_categoryGetUsers = raw_input('Input nth Month(6,7,8,9,10,11,12,1):\n')
-            if ((int(raw_categoryGetUsers) == 1) or (int(raw_categoryGetUsers) >= 6 and int(raw_categoryGetUsers) <= 12)):
-                monthNo = int(raw_categoryGetUsers)
-            else:
-                print('Please input right month')
-                continue
-            break
-        except:
-            if(raw_categoryGetUsers == ''):
-                # getUsers = False
-                break
-            print('1Command input illegal! Please type with 1 or 0!')
-            continue
+    # while not getAllData:
+    #     try:
+    #         raw_categoryNo = raw_input(u'Input category number(1-'+str(length)+', default=1):\n')
+    #         categoryNo = int(raw_categoryNo)
+    #         if categoryNo < 1 or categoryNo > length:
+    #             print('Category number illegal! Please input again!')
+    #             continue
+    #         break
+    #     except:
+    #         if(raw_categoryNo == ''):
+    #             categoryNo = 1
+    #             break
+    #         print('Not a number. Please input again!')
+    #         continue
+    # while not getAllData:
+    #     try:
+    #         raw_categoryGetUsers = raw_input('Input nth Month(6,7,8,9,10,11,12,1):\n')
+    #         if ((int(raw_categoryGetUsers) == 1) or (int(raw_categoryGetUsers) >= 6 and int(raw_categoryGetUsers) <= 12)):
+    #             monthNo = int(raw_categoryGetUsers)
+    #         else:
+    #             print('Please input right month')
+    #             continue
+    #         break
+    #     except:
+    #         if(raw_categoryGetUsers == ''):
+    #             # getUsers = False
+    #             break
+    #         print('1Command input illegal! Please type with 1 or 0!')
+    #         continue
     '''
     while True:
         try:
@@ -377,12 +389,15 @@ def CreateNewlyEndWriter(categoryName):
 
     startTime = str(time.strftime('%Y%m', time.localtime(time.time())))
     name_sheet = filedirectory+categoryName+'/'+"NewlyEndProject_"+categoryName + "_" + startTime + ".csv"
-    if os.path.isfile(name_sheet):
-        flag_newfile = False
-    file_sheet = open(name_sheet, 'wb')
-    file_sheet.write('\xEF\xBB\xBF')
-    writer = unicodecsv.writer(file_sheet)
-    writer.writerow(newlyend_title)
+    if not os.path.isfile(name_sheet):
+        file_sheet = open(name_sheet, 'ab')
+        file_sheet.write('\xEF\xBB\xBF')
+        writer = unicodecsv.writer(file_sheet)
+        writer.writerow(newlyend_title)
+    else:
+        file_sheet = open(name_sheet, 'ab')
+        file_sheet.write('\xEF\xBB\xBF')
+        writer = unicodecsv.writer(file_sheet)
     return writer
     # analyzeNewlyEndData(writer, )
 #-----------------------------
@@ -393,7 +408,7 @@ def getActiveNum():
     flag_newfile = True
     if os.path.isfile(name_sheet):
         flag_newfile = False
-    file_sheet = open(name_sheet, 'wb')
+    file_sheet = open(name_sheet, 'ab')
     file_sheet.write('\xEF\xBB\xBF') #防止windows下excel打开显示乱码
         
     writer = unicodecsv.writer(file_sheet)
@@ -461,16 +476,16 @@ if __name__=='__main__':
         # pageCount = 0
         # getUrlQueue(categoryNo)
         
-        if getAllData:
-            for index in range(categoryStart, categoryEnd + 1):
-                categoryName = categoryNameList[index-1]
-                subFolder = filedirectory+categoryName+'/'
-                createFolder(subFolder)
-        else:
-            categoryId = categoryIdList[categoryNo-1]
-            categoryName = categoryNameList[categoryNo-1]
+        # if getAllData:
+        for index in range(categoryStart, categoryEnd):
+            categoryName = categoryNameList[index-1]
             subFolder = filedirectory+categoryName+'/'
             createFolder(subFolder)
+        # else:
+        #     categoryId = categoryIdList[categoryNo-1]
+        #     categoryName = categoryNameList[categoryNo-1]
+        #     subFolder = filedirectory+categoryName+'/'
+        #     createFolder(subFolder)
         # writers = createWriters(subFolder, categoryName)
 
         # startTime = time.clock()
@@ -534,66 +549,22 @@ if __name__=='__main__':
 
         
         import datetime
-        if not getAllData:
-            categoryName = categoryNameList[categoryNo-1]
+        for index in range(categoryStart, categoryEnd):
+            categoryName = categoryNameList[index-1]
             #for cat in categoryNameList:
             # if datetime.date.today().day == 1:
             newly_end_writer = CreateNewlyEndWriter(categoryName)
             yesterday = datetime.date.today()-datetime.timedelta(days=1)
             lastMonth = yesterday.strftime("%Y%m")
             #name_sheet = filedirectory+"NewlyEnd_"+categoryName+"_"+lastMonth+".txt"
-            monthNoStr = ""
-            if (monthNo == 1):
-                monthNoStr = "201601"
-            elif (monthNo == 6):
-                monthNoStr = "201506"
-            elif (monthNo == 7):
-                monthNoStr = "201507"
-            elif (monthNo == 8):
-                monthNoStr = "201508"
-            elif (monthNo == 9):
-                monthNoStr = "201509"
-            elif (monthNo == 10):
-                monthNoStr = "201510"
-            elif (monthNo == 11):
-                monthNoStr = "201511"
-            elif (monthNo == 12):
-                monthNoStr = "201512"
-            name_sheet = filedirectory+"/NewlyEnd_" + categoryName+"_"+ monthNoStr + ".txt"
-            # name_sheet = "/Users/shawn/Documents/project/kick/newversion/data/NewlyEnd_Dance_201506.txt"
-            try:
-                urlFile = open(name_sheet)
-                if urlFile:
-                    print 'getFile'
-                    urllist = urlFile.readlines()
-                    print len(urllist)
-                    unniurllist = list(set(urllist))
-                    print len(unniurllist)
-                    for url in urllist:
-                        analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
-                        print 'heiheihei'
-            except Exception, e:
-                print e
-                raise e
-        else:
-            for index in range(categoryStart, categoryEnd + 1):
-                categoryName = categoryNameList[index-1]
-                #for cat in categoryNameList:
-                # if datetime.date.today().day == 1:
-                newly_end_writer = CreateNewlyEndWriter(categoryName)
-                yesterday = datetime.date.today()-datetime.timedelta(days=1)
-                lastMonth = yesterday.strftime("%Y%m")
-                #name_sheet = filedirectory+"NewlyEnd_"+categoryName+"_"+lastMonth+".txt"
-                monthNoStr = ""
-                for monthIndex in range(0, 8):
-                    if monthIndex % 8 == 7:
-                        monthNoStr = "201601"
-                    elif monthIndex % 8 <= 3:
-                        monthNoStr = "20150" + str(monthIndex % 8 + 6)
+            if monthEnd == 1:
+                for indexMonth in range(monthStart, 13):
+                    if indexMonth < 10:
+                        monthNoStr = "20150" + str(indexMonth)
                     else:
-                        monthNoStr = "2015" + str(monthIndex % 8 + 6)
+                        monthNoStr = "2015" + str(indexMonth)
                     name_sheet = filedirectory+"/NewlyEnd_" + categoryName+"_"+ monthNoStr + ".txt"
-                    # name_sheet = "/Users/shawn/Documents/project/kick/newversion/data/NewlyEnd_Dance_201506.txt"
+                    print 'file name ' + name_sheet
                     try:
                         urlFile = open(name_sheet)
                         if urlFile:
@@ -608,4 +579,63 @@ if __name__=='__main__':
                     except Exception, e:
                         print e
                         raise e
-        
+            elif monthEnd == 2:
+                for indexMonth in range(monthStart, 13):
+                    if indexMonth < 10:
+                        monthNoStr = "20150" + str(indexMonth)
+                    else:
+                        monthNoStr = "2015" + str(indexMonth)
+                    name_sheet = filedirectory+"/NewlyEnd_" + categoryName+"_"+ monthNoStr + ".txt"
+                    print 'file name ' + name_sheet
+                    try:
+                        urlFile = open(name_sheet)
+                        if urlFile:
+                            print 'getFile'
+                            urllist = urlFile.readlines()
+                            print len(urllist)
+                            unniurllist = list(set(urllist))
+                            print len(unniurllist)
+                            for url in urllist:
+                                analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
+                                print 'heiheihei'
+                    except Exception, e:
+                        print e
+                        raise e
+                name_sheet = filedirectory+"/NewlyEnd_" + categoryName+"_201601.txt"
+                print 'file name ' + name_sheet
+                try:
+                    urlFile = open(name_sheet)
+                    if urlFile:
+                        print 'getFile'
+                        urllist = urlFile.readlines()
+                        print len(urllist)
+                        unniurllist = list(set(urllist))
+                        print len(unniurllist)
+                        for url in urllist:
+                            analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
+                            print 'heiheihei'
+                except Exception, e:
+                    print e
+                    raise e
+            else:
+                for indexMonth in range(monthStart, monthEnd):
+                    if indexMonth < 10:
+                        monthNoStr = "20150" + str(indexMonth)
+                    else:
+                        monthNoStr = "2015" + str(indexMonth)
+                    name_sheet = filedirectory+"/NewlyEnd_" + categoryName+"_"+ monthNoStr + ".txt"
+                    print 'file name ' + name_sheet
+                    try:
+                        urlFile = open(name_sheet)
+                        if urlFile:
+                            print 'getFile'
+                            urllist = urlFile.readlines()
+                            print len(urllist)
+                            unniurllist = list(set(urllist))
+                            print len(unniurllist)
+                            for url in urllist:
+                                analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
+                                print 'heiheihei'
+                    except Exception, e:
+                        print e
+                        raise e
