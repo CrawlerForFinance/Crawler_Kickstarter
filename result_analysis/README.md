@@ -1,0 +1,11 @@
+#kickstarter抓取结果统计脚本
+##一：代码说明dp.py
+	【目的】统计kickstarter网站每个类别每天的抓取情况
+	【输入】
+	（1）data文件夹，kickstarter程序的抓取结果
+	（2）datasummary.xlsx文件，里面记录了之前的统计信息
+	（3）统计起始时间，格式：yyyy-mm-dd（4）统计结束时间
+	【输出】"datasummary时间戳.xlsx"文件
+##二：代码执行
+	直接执行py脚本，确保系统已经安装了openpyxl包
+	转化成exe执行，由于涉及到包依赖，py2exe貌似不能转化成功；用了pyintaller可以转化成功
