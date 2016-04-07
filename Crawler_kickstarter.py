@@ -364,9 +364,9 @@ def getInput():
             continue
             '''
 #----------------------------
-def CreateNewlyEndPrjUsersCreateWriter():
+def CreateNewlyEndPrjUsersCreateWriter(categoryName):
     startTime = str(time.strftime('%Y%m', time.localtime(time.time())))
-    name_sheet = filedirectory+'/'+"users_create_before_" + startTime + ".csv"
+    name_sheet = filedirectory + categoryName +'/' + categoryName + "_users_create" + startTime + ".csv"
     # if os.path.isfile(name_sheet):
     #     flag_newfile = False
     file_sheet = open(name_sheet, 'wb')
@@ -375,9 +375,9 @@ def CreateNewlyEndPrjUsersCreateWriter():
     writer.writerow(titles[6])
     return writer
 #----------------------------
-def CreateNewlyEndPrjUsersBackWriter():
+def CreateNewlyEndPrjUsersBackWriter(categoryName):
     startTime = str(time.strftime('%Y%m', time.localtime(time.time())))
-    name_sheet = filedirectory+'/'+"users_back_before_" + startTime + ".csv"
+    name_sheet = filedirectory + categoryName +'/' + categoryName + "_users_back_" + startTime + ".csv"
     # if os.path.isfile(name_sheet):
     #     flag_newfile = False
     file_sheet = open(name_sheet, 'wb')
@@ -555,8 +555,8 @@ if __name__=='__main__':
             #for cat in categoryNameList:
             # if datetime.date.today().day == 1:
             # newly_end_writer = CreateNewlyEndWriter(categoryName)
-            newly_end_users_create_writer = CreateNewlyEndPrjUsersCreateWriter()
-            newly_end_users_back_writer = CreateNewlyEndPrjUsersBackWriter()
+            newly_end_users_create_writer = CreateNewlyEndPrjUsersCreateWriter(categoryName)
+            newly_end_users_back_writer = CreateNewlyEndPrjUsersBackWriter(categoryName)
             yesterday = datetime.date.today()-datetime.timedelta(days=1)
             lastMonth = yesterday.strftime("%Y%m")
             #name_sheet = filedirectory+"NewlyEnd_"+categoryName+"_"+lastMonth+".txt"
@@ -576,7 +576,7 @@ if __name__=='__main__':
                             print len(urllist)
                             unniurllist = list(set(urllist))
                             print len(unniurllist)
-                            for url in urllist:
+                            for url in unniurllist:
                                 # analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
                                 analyzeNewlyEndUsersData(url.strip(), newly_end_users_create_writer, newly_end_users_back_writer, categoryName)
                                 print 'heiheihei'
@@ -599,7 +599,7 @@ if __name__=='__main__':
                             print len(urllist)
                             unniurllist = list(set(urllist))
                             print len(unniurllist)
-                            for url in urllist:
+                            for url in unniurllist:
                                 # analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
                                 analyzeNewlyEndUsersData(url.strip(), newly_end_users_create_writer, newly_end_users_back_writer, categoryName)
                                 print 'heiheihei'
@@ -616,7 +616,7 @@ if __name__=='__main__':
                         print len(urllist)
                         unniurllist = list(set(urllist))
                         print len(unniurllist)
-                        for url in urllist:
+                        for url in unniurllist:
                             # analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
                             analyzeNewlyEndUsersData(url.strip(), newly_end_users_create_writer, newly_end_users_back_writer, categoryName)
                             print 'heiheihei'
@@ -639,7 +639,7 @@ if __name__=='__main__':
                             print len(urllist)
                             unniurllist = list(set(urllist))
                             print len(unniurllist)
-                            for url in urllist:
+                            for url in unniurllist:
                                 # analyzeNewlyEndData(url.strip(), newly_end_writer, categoryName)
                                 analyzeNewlyEndUsersData(url.strip(), newly_end_users_create_writer, newly_end_users_back_writer, categoryName)
                                 print 'heiheihei'
