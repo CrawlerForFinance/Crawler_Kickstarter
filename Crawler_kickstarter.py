@@ -546,7 +546,6 @@ if __name__=='__main__':
                             print 'heiheihei'
                 except Exception, e:
                     print e
-                    raise e
 
         
         import datetime
@@ -582,7 +581,7 @@ if __name__=='__main__':
                                 print 'heiheihei'
                     except Exception, e:
                         print e
-                        raise e
+
             elif monthEnd == 2:
                 for indexMonth in range(monthStart, 13):
                     if indexMonth < 10:
@@ -605,7 +604,7 @@ if __name__=='__main__':
                                 print 'heiheihei'
                     except Exception, e:
                         print e
-                        raise e
+
                 name_sheet = filedirectory+"/NewlyEnd_" + categoryName+"_201601.txt"
                 print 'file name ' + name_sheet
                 try:
@@ -622,7 +621,6 @@ if __name__=='__main__':
                             print 'heiheihei'
                 except Exception, e:
                     print e
-                    raise e
             else:
                 for indexMonth in range(monthStart, monthEnd):
                     if indexMonth < 10:
@@ -645,4 +643,4 @@ if __name__=='__main__':
                                 print 'heiheihei'
                     except Exception, e:
                         print e
-                        raise e
+
