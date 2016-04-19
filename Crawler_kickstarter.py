@@ -369,10 +369,15 @@ def CreateNewlyEndPrjUsersCreateWriter(categoryName):
     name_sheet = filedirectory + categoryName +'/' + categoryName + "_users_create" + startTime + ".csv"
     # if os.path.isfile(name_sheet):
     #     flag_newfile = False
-    file_sheet = open(name_sheet, 'wb')
-    file_sheet.write('\xEF\xBB\xBF')
-    writer = unicodecsv.writer(file_sheet)
-    writer.writerow(titles[6])
+    if not os.path.isfile(name_sheet):
+        file_sheet = open(name_sheet, 'ab')
+        file_sheet.write('\xEF\xBB\xBF')
+        writer = unicodecsv.writer(file_sheet)
+        writer.writerow(titles[6])
+    else:
+        file_sheet = open(name_sheet, 'ab')
+        file_sheet.write('\xEF\xBB\xBF')
+        writer = unicodecsv.writer(file_sheet)
     return writer
 #----------------------------
 def CreateNewlyEndPrjUsersBackWriter(categoryName):
@@ -380,10 +385,15 @@ def CreateNewlyEndPrjUsersBackWriter(categoryName):
     name_sheet = filedirectory + categoryName +'/' + categoryName + "_users_back_" + startTime + ".csv"
     # if os.path.isfile(name_sheet):
     #     flag_newfile = False
-    file_sheet = open(name_sheet, 'wb')
-    file_sheet.write('\xEF\xBB\xBF')
-    writer = unicodecsv.writer(file_sheet)
-    writer.writerow(titles[5])
+    if not os.path.isfile(name_sheet):
+        file_sheet = open(name_sheet, 'ab')
+        file_sheet.write('\xEF\xBB\xBF')
+        writer = unicodecsv.writer(file_sheet)
+        writer.writerow(titles[5])
+    else:
+        file_sheet = open(name_sheet, 'ab')
+        file_sheet.write('\xEF\xBB\xBF')
+        writer = unicodecsv.writer(file_sheet)
     return writer
 #----------------------------
 def CreateNewlyEndWriter(categoryName):

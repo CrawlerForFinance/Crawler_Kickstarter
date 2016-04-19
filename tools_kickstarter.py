@@ -455,7 +455,7 @@ def recordNewlyEnd(category, url):
 
 def analyzeNewlyEndUsersData(url, writerCreate, writeBack, categoryName):
     webcontent = readFromUrl(url.split("?")[0]+"/description")
-    print url+"/description"
+    print "url: " + url + "/description"
     #print webcontent
     soup = BeautifulSoup(webcontent)
     #about creator
@@ -496,20 +496,22 @@ def analyzeCreatorBackProjectsData(creatorID, createName, catogryNM, writer):
     backProjectListContent = soup_chp.find('div', {'id':'profile_projects_list'})
     if backProjectListContent:
         
-        print 'before inside'
-        print creatorHomePageUrl
+        # print 'before inside'
+        # print creatorHomePageUrl
         if (backProjectListContent):
-            print 'here'
+            # print 'here'
             ulBackPrjContent = backProjectListContent.find('ul', {'class':'mobius'})
             liBackPrjContent = ulBackPrjContent.find('li')
             setBackPrjContent = liBackPrjContent.find_all('div', {'class':'project-card-mini-wrap'})
-            for div in setBackPrjContent:
-                print 'for'
-                aHref = div.find('a')
-                backPrjUrl = 'https://www.kickstarter.com' + aHref['href'] + '?ref=category_ending_soon'
-                #analyzeNewlyEndData('https://www.kickstarter.com/projects/wheretheheckismatt/where-the-heck-is-matt?ref=category_recommended', writer, catogryNM)
-                # print backPrjUrl
-                getBackProjectsData(backPrjUrl, creatorID, createName, writer, catogryNM)
+            if setBackPrjContent:
+                for div in setBackPrjContent:
+                    # print 'for'
+                    aHref = div.find('a')
+                    if aHref:
+                        backPrjUrl = 'https://www.kickstarter.com' + aHref['href'] + '?ref=category_ending_soon'
+                        #analyzeNewlyEndData('https://www.kickstarter.com/projects/wheretheheckismatt/where-the-heck-is-matt?ref=category_recommended', writer, catogryNM)
+                        # print backPrjUrl
+                        getBackProjectsData(backPrjUrl, creatorID, createName, writer, catogryNM)
     else:
         print 'user has been purged'
 #end analyzeCreatorProjectsData
@@ -525,20 +527,24 @@ def analyzeCreatorCreateProjectsData(creatorID, creatorName, catogryNM, writer):
     createProjectListContent = soup_chp.find('div', {'id':'main'})
     if createProjectListContent:
         liCreatePrjContent = createProjectListContent.find_all('li', {'class':'mb2'})
-        for li in liCreatePrjContent:
-            aSetOfCreatePrjContent = li.find_all('a')
-            aHref = ''
-            for aItem in aSetOfCreatePrjContent:
-                partIOfA = aItem['href'].split('/')[1]
-                partIIOfA = partIOfA.split('/')[0]
-                if partIIOfA == 'projects':
-                    aHref = aItem['href']
-                    break
-            if aHref:
-                # print '### start to get create project...'
-                createPrjUrl = 'https://www.kickstarter.com' + aHref
-                # print 'href: ' + createPrjUrl
-                getBackProjectsData(createPrjUrl, creatorID, creatorName, writer, catogryNM)
+        if liCreatePrjContent:
+            for li in liCreatePrjContent:
+                print 'good1'
+                aSetOfCreatePrjContent = li.find_all('a')
+                aHref = ''
+                if aSetOfCreatePrjContent:
+                    for aItem in aSetOfCreatePrjContent:
+                        print 'good2'
+                        partIOfA = aItem['href'].split('/')[1]
+                        partIIOfA = partIOfA.split('/')[0]
+                        if partIIOfA == 'projects':
+                            aHref = aItem['href']
+                            break
+                    if aHref:
+                        # print '### start to get create project...'
+                        createPrjUrl = 'https://www.kickstarter.com' + aHref
+                        # print 'href: ' + createPrjUrl
+                        getBackProjectsData(createPrjUrl, creatorID, creatorName, writer, catogryNM)
     else:
         print 'user has been purged'
 #end analyzeCreatorProjectsData
@@ -558,6 +564,7 @@ def getBackProjectsData(url, creatorUserID, creatorUserName, writer, categoryNam
     soup = BeautifulSoup(webcontent)
     purged_tag = soup.find('div', {'id' : 'purged_project'})
     if not purged_tag:
+        print 'not purged'
         #******************************
         #页面上栏部分
         currentDate = getTime('%Y-%m-%d %H:%M:%S')
@@ -566,16 +573,32 @@ def getBackProjectsData(url, creatorUserID, creatorUserName, writer, categoryNam
         tag_time = soup.find('div', {'class':'NS_projects__funding_period'})
         #统一beginDate, endDate
         if tag_time:
-            tag_time_begin = tag_time.find_all('time')[0]
-            tag_time_end = tag_time.find_all('time')[1]
-            if tag_time_begin and tag_time_end:
-                beginDate = tag_time_begin['datetime']
-                endDate = tag_time_end['datetime']
-                spanDays = re.split('[()]', tag_time.find('p').text)[1]
-                spanDays = spanDays.split(' ')[0]
-                print "beginDate: " + beginDate
-                print "endDate: " + endDate
-                print "spanDays: " + spanDays
+            print 'tag_time'
+            print str(tag_time)
+            if len(tag_time.find_all('time')) > 1:
+                tag_time_begin = tag_time.find_all('time')[0]
+                tag_time_end = tag_time.find_all('time')[1]
+                if tag_time_begin and tag_time_end:
+                    print 'tag_time_begin and tag_time_end'
+                    beginDate = tag_time_begin['datetime']
+                    endDate = tag_time_end['datetime']
+                    spanDays = re.split('[()]', tag_time.find('p').text)[1]
+                    spanDays = spanDays.split(' ')[0]
+                    print "beginDate: " + beginDate
+                    print "endDate: " + endDate
+                    print "spanDays: " + spanDays
+            else:
+                tag_duration = soup.find('span', {'id':'project_duration_data'})
+                if tag_duration:
+                    #spanDays = re.match('(\d+).\d?', tag_duration['data-duration']).group(1)
+                    remaining = tag_duration['data-hours-remaining']
+                    spanDays = tag_duration['data-duration']
+                    endData = tag_duration['data-end_time']
+                    # beginDate = (parse(endData) - datetime.timedelta(days=float(spanDays))).strftime("%Y%m%d")
+                    beginDate = (parse(endData) - datetime.timedelta(days=float(spanDays))).strftime("%Y-%m-%dT%H:%M:%S") + "-04:00"
+                    print "beginDate: " + beginDate
+                    print "endDate: " + endDate
+                    print "spanDays: " + spanDays
 
         tag_duration = soup.find('span', {'id':'project_duration_data'})
         #没有结束的和没有成功的时有这个标签的，成功的是没有这个标签的
@@ -588,17 +611,21 @@ def getBackProjectsData(url, creatorUserID, creatorUserName, writer, categoryNam
             # endData = tag_duration['data-end_time']
             # beginDate = (parse(endData) - datetime.timedelta(days=float(spanDays))).strftime("%Y%m%d")
             tag_creator = soup.find('a', {'class':'remote_modal_dialog green-dark'})
+            # print 'tag_creator'
             if tag_creator:
                 creatorstr = tag_creator.text
                 creatorUrl = url.split('?')[0] + "/creator_bio"
             tag_backersCount = soup.find('div', {'id':'backers_count'})
+            # print 'tag_backersCount'
             if tag_backersCount:
                 backers = tag_backersCount['data-backers-count']
             tag_PlgAmg = soup.find('div', {'id':'pledged'})
+            # print 'tag_PlgAmg'
             if tag_PlgAmg:
                 PlgAmt = re.search('\D+(\d+[,.]*\d*)?', tag_PlgAmg.find('data').string).group(1)
                 PlgAmt = PlgAmt.replace(',', '')
             tag_Goal = soup.find('div',{'class':'num h1 bold nowrap'})
+            # print 'tag_Goal'
             if tag_Goal:
                 Goal = tag_Goal['data-goal']
                 Goal = Goal.replace(',', '')
@@ -606,12 +633,12 @@ def getBackProjectsData(url, creatorUserID, creatorUserName, writer, categoryNam
         else:
             isSuccessful = "1"
             tag_creator = soup.find('a', {'class':'hero__link remote_modal_dialog js-update-text-color'})
-            #print tag_creator
+            # print tag_creator
             if tag_creator:
                 creatorstr = tag_creator.text
                 creatorUrl = url.split('?')[0] + "/creator_bio"
             tag_Successful = soup.find('div', {'class':'NS_projects__spotlight_stats'})
-            #print tag_Successful
+            # print tag_Successful
             if tag_Successful:
                 backersstr = tag_Successful.find('b').text
                 backers = backersstr.split(' ')[0]
@@ -635,9 +662,9 @@ def getBackProjectsData(url, creatorUserID, creatorUserName, writer, categoryNam
                 # endData = DatesList[1]['datetime']
                 # spanDays = (parse(endData) - parse(beginDate)).days
         print "isSuccessful:" + str(isSuccessful)
-        print "spanDays:" + str(spanDays)
-        print "endDate:" + endDate
-        print "beginDate:" + beginDate
+        # print "spanDays:" + str(spanDays)
+        # print "endDate:" + endDate
+        # print "beginDate:" + beginDate
         print "backers:" + str(backers)
         print "plgAmt:" + PlgAmt
         print "Goal:" + str(Goal)
@@ -654,7 +681,7 @@ def getBackProjectsData(url, creatorUserID, creatorUserName, writer, categoryNam
             # print "location:" + location
         # tag_location = soup.find_all('a', {'class':'grey-dark mr3 nowrap'})[0]
         tag_location_subcategory = soup.find('div', {'class': 'NS_projects__category_location'})
-        print "tag_location_subcategory:" + str(tag_location_subcategory)
+        # print "tag_location_subcategory:" + str(tag_location_subcategory)
         tag_location = tag_location_subcategory.find_all('a')[0]
 
         location_City = ''
