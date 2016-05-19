@@ -68,7 +68,7 @@ def analyzeData(url, writers, attr):
         comments = tag_comments['data-comments-count']
         print "comments   ", comments
 
-    tag_location = soup.find_all('a', {'class':'grey-dark mr3 nowrap'})
+    tag_location = soup.find_all('a', {'class':'grey-dark mr2 nowrap'})
     if tag_location:
         tag_location = tag_location[0]
     location_City = ''
@@ -78,9 +78,9 @@ def analyzeData(url, writers, attr):
         if ',' in location_str:
             location_City = location_str.split(",")[0].strip()
             location_State = location_str.split(",")[1].strip()
-            print "location_City:",location_City, "  location_State",location_State 
+            # print "location_City:",location_City, "  location_State",location_State 
     
-    tag_subcategory = soup.find_all('a', {'class':'grey-dark mr3 nowrap'})
+    tag_subcategory = soup.find_all('a', {'class':'grey-dark mr2 nowrap'})
     if tag_subcategory:
         for singleItem in tag_subcategory:
             ref = singleItem['href'].split('?ref=')
@@ -200,7 +200,7 @@ def analyzeData(url, writers, attr):
             creatorAdd_State = creatorAdd_str.split(',')[1]
         else:
             creatorAdd_City = creatorAdd_State = creatorAdd_str
-        print "city:",creatorAdd_City,"  state,",creatorAdd_State
+        # print "city:",creatorAdd_City,"  state,",creatorAdd_State
     tag_creatorFB = soup_creator.find('div', {'class':'facebook py1 border-bottom h5'})
     if tag_creatorFB:
         #FB_friends = re.match('(\s|\n)*(\d+).*', tag_creatorFB.find('span', class_='number').string).group(2)
@@ -212,8 +212,10 @@ def analyzeData(url, writers, attr):
                 FB_name = tag_FB_name.string
             tag_FB_friends = tag_creatorFB.find('span', {'class':'number h6 nowrap'})
             if tag_FB_friends:
-                FB_friends_spliter = tag_FB_friends.string.split(' ')
-                FB_friends = FB_friends_spliter[0]
+                FB_friends_spliter = tag_FB_friends.find('a', {'class':'popup'})
+                if FB_friends_spliter:
+                    print "FB_friends:", FB_friends_spliter.string
+                    FB_friends = FB_friends_spliter.string
     tag_website = soup_creator.find('div', {'class':'pt4 mobile-hide'})
     if tag_website:
         list_websites = tag_website.find('a', {'rel':'nofollow'})

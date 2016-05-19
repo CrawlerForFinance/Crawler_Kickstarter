@@ -49,6 +49,9 @@ def analyzeNewlyEndData(url, writer, categoryName):
     #没有结束的和没有成功的时有这个标签的，成功的是没有这个标签的
     tag_success = soup.find('div',{'calss':'NS_projects__spotlight_stats'})
     if not tag_success:
+        tag_duration = soup.find('span', {'id':'project_duration_data'})
+        if not tag_duration:
+            return
         #spanDays = re.match('(\d+).\d?', tag_duration['data-duration']).group(1)
         remaining = tag_duration['data-hours-remaining']
         if int(remaining) == 0:

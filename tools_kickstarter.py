@@ -331,14 +331,17 @@ def getBackProjectsData(url, creatorUserID, creatorUserName, writer, categoryNam
             location_State = location_str.split(",")[1].strip()
             print "location_City:",location_City, "  location_State",location_State 
     # print location_City + ", " + location_State
-    tag_subcategory = soup.find_all('a', {'class':'grey-dark mr3 nowrap'})
+    tag_subcategory = soup.find_all('a', {'class':'grey-dark mr2 nowrap'})
     if tag_subcategory:
         for singleItem in tag_subcategory:
             ref = singleItem['href'].split('?ref=')
+            print "ref_1:", ref[1]
             if ref[1] == 'category':
                 hrefspliter = ref[0].split('/')
                 subcategory = hrefspliter[-1]
                 subcategory = subcategory.replace('%20', ' ')
+                print "subcategory:  ", subcategory
+                break
 
     urltrip = url.split('?')[0]
     attrs1 = [urltrip, currentDate, category, subcategory, title, location_City, location_State, Goal, PlgAmt, Unit, isSuccessful, backers]
